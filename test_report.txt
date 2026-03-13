@@ -1,0 +1,18 @@
+ACME COMPANY - ANNUAL REPORT 2024
+
+INCOME STATEMENT
+Revenue:          R 5,200,000
+Cost of Sales:    R 3,100,000
+Gross Profit:     R 2,100,000
+Operating Costs:  R 1,400,000
+Net Profit:       R 700,000
+
+BALANCE SHEET
+Total Assets:     R 8,500,000
+Total Liabilities: R 3,200,000
+Equity:           R 5,300,000
+
+NOTES:
+- Revenue grew 12% from 2023
+- New contract with supplier reduced cost of sales
+- Outstanding debtor balance of R 450,000 overdue 90+ days

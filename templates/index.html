@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ agent_name }}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<style>
+  
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #0f1117;
+  color: #e0e0e0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app {
+  display: flex;
+  height: 100vh;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  width: 240px;
+  min-width: 240px;
+  background: #161b27;
+  border-right: 1px solid #1e2d3d;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 14px;
+  gap: 24px;
+}
+
+.logo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.version {
+  font-size: 0.7rem;
+  color: #4a6070;
+  margin-top: 2px;
+}
+
+.section-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #4a6070;
+  margin-bottom: 8px;
+}
+
+.upload-btn {
+  display: block;
+  padding: 8px 12px;
+  background: #1e2d3d;
+  border: 1px dashed #2a4060;
+  border-radius: 8px;
+  color: #7090a0;
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.upload-btn:hover {
+  border-color: #00d4aa;
+  color: #00d4aa;
+}
+
+.loaded-file {
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: #00d4aa;
+  word-break: break-all;
+}
+
+.action-btn {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  background: #1a2030;
+  border: 1px solid #1e2d3d;
+  border-radius: 8px;
+  color: #8090a0;
+  font-size: 0.78rem;
+  cursor: pointer;
+  text-align: left;
+  margin-bottom: 6px;
+  transition: all 0.15s;
+}
+
+.action-btn:hover {
+  border-color: #00d4aa;
+  color: #fff;
+  background: #1a2a3a;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+}
+
+.clear-btn {
+  width: 100%;
+  padding: 8px;
+  background: none;
+  border: 1px solid #1e2d3d;
+  border-radius: 8px;
+  color: #4a6070;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.clear-btn:hover {
+  border-color: #ff6b35;
+  color: #ff6b35;
+}
+
+/* ── Chat area ── */
+.chat-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.chat-messages::-webkit-scrollbar { width: 4px; }
+.chat-messages::-webkit-scrollbar-thumb { background: #1e2d3d; border-radius: 4px; }
+
+/* ── Messages ── */
+.message {
+  display: flex;
+  gap: 12px;
+  animation: fadeUp 0.2s ease;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.message-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #1e2d3d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.message-bubble {
+  background: #161b27;
+  border: 1px solid #1e2d3d;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 0.875rem;
+  line-height: 1.65;
+  max-width: 75%;
+}
+
+.user-message {
+  flex-direction: row-reverse;
+}
+
+.user-message .message-bubble {
+  background: #1a2a4a;
+  border-color: #1e3a6a;
+  color: #c8d8ff;
+}
+
+.user-message .message-avatar {
+  background: #1a2a4a;
+}
+
+/* ── Input bar ── */
+.input-bar {
+  padding: 16px 24px;
+  border-top: 1px solid #1e2d3d;
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+#user-input {
+  flex: 1;
+  background: #161b27;
+  border: 1px solid #1e2d3d;
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: #e0e0e0;
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 0.875rem;
+  resize: none;
+  outline: none;
+  min-height: 42px;
+  max-height: 120px;
+  line-height: 1.5;
+  transition: border-color 0.2s;
+}
+
+#user-input:focus {
+  border-color: #00d4aa;
+}
+
+#user-input::placeholder {
+  color: #3a5060;
+}
+
+#send-btn {
+  padding: 10px 20px;
+  background: #00d4aa;
+  border: none;
+  border-radius: 10px;
+  color: #000;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  height: 42px;
+}
+
+#send-btn:hover { opacity: 0.85; }
+#send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.thinking {
+    color: var(--muted, #4a6070);
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.thinking::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: #00d4aa;
+    border-radius: 50%;
+    display: inline-block;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.2; transform: scale(1); }
+    50%       { opacity: 1;   transform: scale(1.4); }
+}
+</style>
+</head>
+<body>
+
+  <div class="app">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">💹 {{ agent_name }}</div>
+        <div class="version">v{{ version }}</div>
+      </div>
+
+      <!-- File upload -->
+      <div class="upload-section">
+        <div class="section-label">Documents</div>
+        <label class="upload-btn">
+          + Upload Report
+          <input type="file" id="file-input" accept=".pdf,.xlsx,.xls,.csv,.txt" hidden>
+        </label>
+        <div id="loaded-file" class="loaded-file"></div>
+      </div>
+
+      <!-- Quick actions -->
+      <div class="actions-section">
+        <div class="section-label">Quick Actions</div>
+        <button class="action-btn" onclick="sendQuick('Give me an executive summary of this document')">
+          📋 Summary
+        </button>
+        <button class="action-btn" onclick="sendQuick('What are the key financial ratios?')">
+          📐 Ratios
+        </button>
+        <button class="action-btn" onclick="sendQuick('What are the risks and red flags?')">
+          ⚠️ Risks
+        </button>
+        <button class="action-btn" onclick="sendQuick('What trends do you see in this data?')">
+          📈 Trends
+        </button>
+      </div>
+
+      <!-- Clear button at bottom -->
+      <div class="sidebar-footer">
+        <button class="clear-btn" onclick="clearChat()">🗑 Clear Chat</button>
+      </div>
+    </div>
+
+    <!-- Main chat area -->
+    <div class="chat-area">
+
+      <div class="chat-messages" id="messages">
+        <!-- Welcome message -->
+        <div class="message agent-message">
+          <div class="message-avatar">💹</div>
+          <div class="message-bubble">
+            Hello! I am <strong>{{ agent_name }}</strong>. 
+            Upload a financial report using the sidebar, 
+            then ask me anything about it.
+          </div>
+        </div>
+      </div>
+
+      <!-- Input bar -->
+      <div class="input-bar">
+        <textarea 
+          id="user-input" 
+          placeholder="Ask about the financials…"
+          rows="1"
+        ></textarea>
+        <button id="send-btn" onclick="sendMessage()">Send</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script >
+    const sessionId = 'session_' + Date.now();
+
+// Auto resize textarea as user types
+const textarea = document.getElementById('user-input');
+textarea.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+});
+
+// Enter to send, Shift+Enter for new line
+textarea.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+    }
+});
+
+// File upload handler
+document.getElementById('file-input').addEventListener('change', async function() {
+    const file = this.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('session_id', sessionId);
+
+    const loadedFile = document.getElementById('loaded-file');
+    loadedFile.textContent = '⏳ Loading ' + file.name + '...';
+
+    try {
+        const response = await fetch('/upload', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            loadedFile.textContent = '✅ ' + data.filename;
+            appendMessage('agent', '📄 Document loaded: ' + data.filename + '. Ask me anything about it.');
+        } else {
+            loadedFile.textContent = '❌ Error loading file';
+            appendMessage('agent', '❌ Could not load that file. Try a PDF, Excel or CSV.');
+        }
+    } catch (err) {
+        loadedFile.textContent = '❌ Upload failed';
+        console.error('Upload error:', err);
+    }
+});
+
+// Send a quick action message
+function sendQuick(message) {
+    document.getElementById('user-input').value = message;
+    sendMessage();
+}
+
+// Scroll chat to bottom
+function scrollToBottom() {
+    const messages = document.getElementById('messages');
+    messages.scrollTop = messages.scrollHeight;
+}
+
+// Append a message bubble to the chat
+function appendMessage(role, text) {
+    const messages = document.getElementById('messages');
+
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message');
+    messageDiv.classList.add(role === 'user' ? 'user-message' : 'agent-message');
+
+    const avatar = document.createElement('div');
+    avatar.classList.add('message-avatar');
+    avatar.textContent = role === 'user' ? '👤' : '💹';
+
+    const bubble = document.createElement('div');
+    bubble.classList.add('message-bubble');
+    bubble.textContent = text;
+
+    messageDiv.appendChild(avatar);
+    messageDiv.appendChild(bubble);
+    messages.appendChild(messageDiv);
+
+    scrollToBottom();
+    return bubble;
+}
+
+// Main send function
+async function sendMessage() {
+    const input = document.getElementById('user-input');
+    const message = input.value.trim();
+
+    if (!message) return;
+
+    input.value = '';
+    input.style.height = 'auto';
+    document.getElementById('send-btn').disabled = true;
+
+    appendMessage('user', message);
+
+    const agentBubble = appendMessage('agent', '⏳ Thinking...');
+
+    // Simple flag to track if first word has arrived
+    let firstWord = true;
+
+    const response = await fetch('/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: message, session_id: sessionId })
+    });
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+
+        const lines = buffer.split('\n');
+        buffer = lines.pop();
+
+        for (const line of lines) {
+            if (line.startsWith('data:')) {
+                const jsonStr = line.startsWith('data: ') ? line.slice(6) : line.slice(5);
+
+                let data;
+                try {
+                    data = JSON.parse(jsonStr);
+                } catch(e) {
+                    continue;
+                }
+
+                if (data.word) {
+                    // Clear thinking indicator on first word
+                    if (firstWord) {
+                        agentBubble.textContent = '';
+                        firstWord = false;
+                    }
+                    agentBubble.textContent += data.word;
+                    scrollToBottom();
+                }
+
+                if (data.done) {
+                    document.getElementById('send-btn').disabled = false;
+                    input.focus();
+                }
+            }
+        }
+    }
+}
+
+// Clear chat
+async function clearChat() {
+    await fetch('/clear', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: sessionId })
+    });
+
+    const messages = document.getElementById('messages');
+    messages.innerHTML = '';
+    document.getElementById('loaded-file').textContent = '';
+
+    appendMessage('agent', 'Chat cleared. Upload a new document to get started.');
+}
+  </script>
+</body>
+</html>
